@@ -7,7 +7,10 @@
 /Maps1/ptrkg/
 /Maps1/curvedSurface/
 /Maps1/.map/.cnd/
-/Maps1/.map/1/
 /Maps1/.map/*/*.cnd
 /Maps1/.map/*/*.txt.svg
 /Maps1/.map/*/*.map.Z
+/Maps1/.map/1/
+*.png
+*.xml
+*.iml
