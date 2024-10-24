@@ -27,9 +27,13 @@ import numpy.typing as npt
 #      dict[str, npt.ArrayLike]
 #
 def read_data(file_location: str, exclude: list[str] = None) -> dict[str, npt.ArrayLike]:
+
+    if exclude is None:
+        exclude = list()
+
     maps = glob.glob(file_location + "*.txt")
     elements = glob.glob(file_location + "*.pm")
-    elements = {x.split('.')[1].split("\\")[-1]: x.split('.')[2] for x in elements if x.split('.')[2] not in exclude}
+    elements = {x.split('.')[-3].split("\\")[-1]: x.split('.')[-2] for x in elements if x.split('.')[-2] not in exclude}
     datas = {}
 
     for file_name in maps:
@@ -91,6 +95,8 @@ def map_series(datas: dict[str, npt.ArrayLike], label="map", pixel_size=(1.0, 1.
         kwargs_for_grid = {}
     if kwargs_for_imshow is None:
         kwargs_for_imshow = {}
+    if limits is None:
+        limits = {}
 
     map_size = list(datas.values())[0].shape
     x_map, y_map = np.meshgrid(np.arange(0, (map_size[0]) * pixel_size[0], pixel_size[0]),
@@ -138,15 +144,19 @@ def map_series(datas: dict[str, npt.ArrayLike], label="map", pixel_size=(1.0, 1.
         fig = plt.figure(**kwargs_for_fig)
         gs = fig.add_gridspec(rows, columns, **kwargs_for_grid)
 
-        ax = fig.add_subplot(gs[0, 0])
+        if "CP" in list(datas.keys()):
+            ax = fig.add_subplot(gs[0, 0])
 
-        im = ax.pcolormesh(x_map, y_map, ndimage.rotate(datas["CP"], -90), shading='nearest', cmap='Greys_r')
-        fig.colorbar(im, ax=ax, label="counts", use_gridspec=True)
-        ax.axis('scaled')
-        ax.set_ylabel(r"y ($\mu$m)")
+            im = ax.pcolormesh(x_map, y_map, ndimage.rotate(datas["CP"], -90), shading='nearest', cmap='Greys_r')
+            fig.colorbar(im, ax=ax, label="counts", use_gridspec=True)
+            ax.axis('scaled')
+            ax.set_ylabel(r"y ($\mu$m)")
 
-        j = 1
-        i = 0
+            j = 1
+            i = 0
+        else:
+            j = 0
+            i = 0
 
         for key, values in datas.items():
             if key == "CP":
@@ -179,4 +189,3 @@ def map_series(datas: dict[str, npt.ArrayLike], label="map", pixel_size=(1.0, 1.
         plt.savefig(label + "_all" + extension, dpi=300)
 
     # print()
-
